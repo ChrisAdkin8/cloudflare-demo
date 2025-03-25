@@ -4,7 +4,7 @@ Repo containing a terraform config and instructions for creating an EC2 based or
 
 # Instructions
 
-1. Create a custom domain, for the purposes of this example [Namecheap.com](https://www.namecheap.com/) will be used, note that by default denssec will be turned off - which is exactly what is required
+1. Create a custom domain, for the purposes of this example [namecheap.com](https://www.namecheap.com/) will be used, note that by default denssec will be turned off - which is exactly what is required
    for the purposes of this demo.
 
 2. Create a free [cloudflare](https://www.cloudflare.com/en-gb/) account, when you have successfully done this, cloudflare will create two name servers for you which will be required for the next step.
