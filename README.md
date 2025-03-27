@@ -19,10 +19,10 @@ Repo containing a terraform config and instructions for creating an EC2 based or
 
 4. Clone this repo with git:
 ```
-git clone
+git clone https://github.com/ChrisAdkin8/cloudflare-demo.git
 ```
 
-5. Create a file in the same directory as the rest of the terraform config files with the text editor of your choosing with the following line, replace the placeholder
+5. Create a file in the cloudflare-demo directory as the rest of the terraform config files with the text editor of your choosing with the following line, replace the placeholder
    in angular brackets with your actual domain name:
 ```
 domain = "<your domain name goes here>"
@@ -44,6 +44,44 @@ zone_id = "<your domain zone id goes here>"
 api_token = "<your api token string goes here>"
 ```
 
-8. 
+8. Download and install the plugins for the providers used in the config:
+```
+terraform init
+```
 
+9. In the same shell that the last command was issued from set the environment variables that terraform will use in order to access your AWS account, replace the placeholder as appropriate,
+   note that the last two environment variables are only required if you are using an AWS session token:
+```
+export AWS_ACCESS_KEY=<your aws access key goes here>
+export AWS_SECERET_ACCESS_KEY=<your aws secret access key goes here>
+export AWS_SESSION_TOKEN=<your aws session token goes here>
+export AWS_SESSION_EXPIRY=<your session expirey date time string goes here>
+```
+
+10. Apply the terraform config:
+```
+terraform apply -auto-approve
+```
+    when the config has been applied, output similar to the following should be observed:
+```
+Plan: 7 to add, 0 to change, 0 to destroy.
+tls_private_key.ec2_key: Creating...
+aws_subnet.default_subnet: Creating...
+aws_security_group.web_sg: Creating...
+tls_private_key.ec2_key: Creation complete after 1s [id=f9c3603f9a45cadecc566fcbeafd532eab8e063e]
+aws_key_pair.ec2_key_pair: Creating...
+local_file.private_key: Creating...
+local_file.private_key: Creation complete after 0s [id=2c342823bb2a864acec0d096fa8160d2eb38ec95]
+aws_key_pair.ec2_key_pair: Creation complete after 1s [id=ec2-key]
+aws_security_group.web_sg: Creation complete after 3s [id=sg-0048b46c4c4cc3576]
+aws_subnet.default_subnet: Still creating... [10s elapsed]
+aws_subnet.default_subnet: Creation complete after 11s [id=subnet-086409a3906cb0526]
+aws_instance.web: Creating...
+aws_instance.web: Still creating... [10s elapsed]
+aws_instance.web: Creation complete after 14s [id=i-0ba693bf4ee66d432]
+cloudflare_dns_record.origin: Creating...
+cloudflare_dns_record.origin: Creation complete after 2s [id=87bde468576b4eab5dff13eaa99fd8af]
+
+Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
+```
  
