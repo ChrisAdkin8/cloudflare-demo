@@ -103,4 +103,26 @@ Outputs:
 cert_pem_cp_command = "scp -i ec2-key.pem cert.pem ec2-user@35.170.61.67:/etc/ssl/certs/"
 key_pem_cp_command = "scp -i ec2-key.pem key.pem ec2-user@35.170.61.67:/etc/ssl/key/"
 ```
+
+12. Next we are going to enforce strong encryption for traffic between your httpbin's visitors and Cloudflare,
+    and between Cloudflare and your origin server, to do this go into the CloudFlare portal, click on your 
+    domain and then navigate through:
+
+    "SSL/TLS" on the left hand menu bar -> Configure -> "Custom SSL/TLS"
+    -> hit the radio button for "Full (Strict)" and then hit Save.
+
+13. To create a customer certifcate for encryption signed by the CloudFlare CA, whilst still inside the CloudFlare
+    portal navigate through:
+
+    "SSL/TLS" -> "Origin Server" -> "Create Certificate" -> (leave the defaults as they are) and hit 'Create'
+
+14. You will be presented with a screen that provides the text for a key and private certificate, copy the key text
+    to a local file called key.pem and the private cert text to a file called cert.pem.
+
+15. Issue ```terraform output``` to obtain the scp commands that need to be run in order to upload the key.pem
+    and cert.pem files to your EC2 instance. Copy these commands and run them on your shell command line.
+
+    
+    
+ 
  
