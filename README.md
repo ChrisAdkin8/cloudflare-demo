@@ -64,24 +64,43 @@ export AWS_SESSION_EXPIRY=<your session expirey date time string goes here>
 
     when the config has been applied, output similar to the following should be observed:
 ```
-Plan: 7 to add, 0 to change, 0 to destroy.
+Plan: 11 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + cert_pem_cp_command = (known after apply)
+  + key_pem_cp_command  = (known after apply)
 tls_private_key.ec2_key: Creating...
-aws_subnet.default_subnet: Creating...
-aws_security_group.web_sg: Creating...
-tls_private_key.ec2_key: Creation complete after 1s [id=f9c3603f9a45cadecc566fcbeafd532eab8e063e]
+aws_vpc.default: Creating...
+tls_private_key.ec2_key: Creation complete after 1s [id=19c3c39cb91be4bc98abc09d57646346d9996cd5]
 aws_key_pair.ec2_key_pair: Creating...
 local_file.private_key: Creating...
-local_file.private_key: Creation complete after 0s [id=2c342823bb2a864acec0d096fa8160d2eb38ec95]
-aws_key_pair.ec2_key_pair: Creation complete after 1s [id=ec2-key]
-aws_security_group.web_sg: Creation complete after 3s [id=sg-0048b46c4c4cc3576]
+local_file.private_key: Creation complete after 0s [id=b206a05924b033218b256031b8373d8953e7922e]
+aws_key_pair.ec2_key_pair: Provisioning with 'local-exec'...
+aws_key_pair.ec2_key_pair (local-exec): Executing: ["/bin/sh" "-c" "chmod 400 ec2-key.pem"]
+aws_key_pair.ec2_key_pair: Creation complete after 0s [id=ec2-key]
+aws_vpc.default: Creation complete after 2s [id=vpc-03722193fe99a47f0]
+aws_internet_gateway.main_igw: Creating...
+aws_subnet.default_subnet: Creating...
+aws_security_group.web_sg: Creating...
+aws_internet_gateway.main_igw: Creation complete after 1s [id=igw-0d8f68ee2b6f4c418]
+aws_route_table.main_route_table: Creating...
+aws_route_table.main_route_table: Creation complete after 2s [id=rtb-071c3daab5e361647]
+aws_security_group.web_sg: Creation complete after 3s [id=sg-0f7198f659e5f21af]
 aws_subnet.default_subnet: Still creating... [10s elapsed]
-aws_subnet.default_subnet: Creation complete after 11s [id=subnet-086409a3906cb0526]
+aws_subnet.default_subnet: Creation complete after 12s [id=subnet-0c89f81ed7e22c0f4]
+aws_route_table_association.main_assoc: Creating...
 aws_instance.web: Creating...
+aws_route_table_association.main_assoc: Creation complete after 0s [id=rtbassoc-0c2f5d37bf39b2527]
 aws_instance.web: Still creating... [10s elapsed]
-aws_instance.web: Creation complete after 14s [id=i-0ba693bf4ee66d432]
+aws_instance.web: Creation complete after 13s [id=i-0e79b815d5197ac07]
 cloudflare_dns_record.origin: Creating...
-cloudflare_dns_record.origin: Creation complete after 2s [id=87bde468576b4eab5dff13eaa99fd8af]
+cloudflare_dns_record.origin: Creation complete after 1s [id=68c2f2d4ac4e6404de2fab64f1f115b0]
 
-Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
+Apply complete! Resources: 11 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+cert_pem_cp_command = "scp -i ec2-key.pem cert.pem ec2-user@35.170.61.67:/etc/ssl/certs/"
+key_pem_cp_command = "scp -i ec2-key.pem key.pem ec2-user@35.170.61.67:/etc/ssl/key/"
 ```
  
