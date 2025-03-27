@@ -59,9 +59,8 @@ export AWS_SESSION_EXPIRY=<your session expirey date time string goes here>
 ```
 
 10. Apply the terraform config:
-```
-terraform apply -auto-approve
-```
+```terraform apply -auto-approve```
+
     when the config has been applied, output similar to the following should be observed:
 ```
 Plan: 7 to add, 0 to change, 0 to destroy.
