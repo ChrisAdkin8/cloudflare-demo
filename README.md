@@ -7,7 +7,10 @@ Repo containing a terraform config and instructions for creating an EC2 based or
 - [git command line tools](https://git-scm.com/downloads)
 - [terraform CLI](https://developer.hashicorp.com/terraform/install)
 - An AWS account
-- A VPC with a CIDR of 172.31.0.0/16
+
+# Disclaimer
+
+The terraform config in this repo should only be used for demonstration purposes.
 
 # Instructions
 
