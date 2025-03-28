@@ -6,6 +6,10 @@ resource "tls_private_key" "ec2_key" {
 resource "aws_key_pair" "ec2_key_pair" {
   key_name   = "ec2-key"  # Name of the key pair in AWS
   public_key = tls_private_key.ec2_key.public_key_openssh
+
+  provisioner "local-exec" {
+    command = "chmod 400 ec2-key.pem"
+  }
 }
 
 resource "local_file" "private_key" {
@@ -26,6 +30,11 @@ resource "aws_instance" "web" {
               yum install -y docker
               service docker start
               docker run -d -p 80:80 --name httpbin kennethreitz/httpbin
+              # Ensure directories necessary for the installation of
+              # a cloudflare CA signed cert exists 
+              mkdir -p /etc/ssl/certs
+              chown ec2-user:ec2-user /etc/ssl/certs
+              chmod 755 /etc/ssl/certs
               EOF
 
   tags = {
@@ -33,8 +42,12 @@ resource "aws_instance" "web" {
   }
 }
 
+resource "aws_vpc" "default" {
+  cidr_block = "172.31.0.0/16"
+}
+
 resource "aws_subnet" "default_subnet" {
-  vpc_id                  = "vpc-06264769314079f22"
+  vpc_id                  = aws_vpc.default.id 
   cidr_block              = "172.31.0.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
@@ -44,10 +57,36 @@ resource "aws_subnet" "default_subnet" {
   }
 }
 
+resource "aws_internet_gateway" "main_igw" {
+  vpc_id = aws_vpc.default.id
+
+  tags = {
+    Name = "Main-IGW"
+  }
+}
+
+resource "aws_route_table" "main_route_table" {
+  vpc_id = aws_vpc.default.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main_igw.id
+  }
+
+  tags = {
+    Name = "Main-Route-Table"
+  }
+}
+
+resource "aws_route_table_association" "main_assoc" {
+  subnet_id      = aws_subnet.default_subnet.id
+  route_table_id = aws_route_table.main_route_table.id
+}
+
 resource "aws_security_group" "web_sg" {
   name        = "web_sg"
   description = "Allow HTTP and SSH"
-  vpc_id      = "vpc-06264769314079f22"
+  vpc_id      = aws_vpc.default.id 
 
   ingress {
     from_port   = 80
@@ -84,6 +123,21 @@ resource "aws_security_group" "web_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Allow from anywhere, adjust as needed
+  }
+
+  # Egress: Allow outgoing traffic on port 443
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Allow to anywhere, adjust as needed
+  }
 }
 
 resource "cloudflare_dns_record" "origin" {
@@ -92,5 +146,5 @@ resource "cloudflare_dns_record" "origin" {
   content = aws_instance.web.public_ip
   type    = "A"
   proxied = true  # Traffic proxied through Cloudflare
-  ttl     = 1	  # Muat be set to 1 when cloudflare is used as a proxy 
+  ttl     = 1	    # Must be set to 1 when cloudflare is used as a proxy 
 }
