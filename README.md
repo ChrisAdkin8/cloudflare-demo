@@ -1,6 +1,6 @@
 # Description
 
-Repo containing a terraform config and instructions for creating an EC2 based origin server running the httpbin application woth traffic proxied through cloudflare.
+Repo containing a terraform config and instructions for creating an EC2 based origin server running the httpbin application woth traffic proxied through CloudFlare.
 
 # Prerequisites
 
@@ -14,9 +14,9 @@ Repo containing a terraform config and instructions for creating an EC2 based or
 1. Create a custom domain, for the purposes of this example [namecheap.com](https://www.namecheap.com/) will be used, note that by default denssec will be turned off - which is exactly what is required
    for the purposes of this demo.
 
-2. Create a free [cloudflare](https://www.cloudflare.com/en-gb/) account, when you have successfully done this, cloudflare will create two name servers for you which will be required for the next step.
+2. Create a free [cloudflare](https://www.cloudflare.com/en-gb/) account, when you have successfully done this, CloudFlare will create two name servers for you which will be required for the next step.
 
-3. Log into the namecheap portal and add the cloudflare name servers to the custom dns settings for your domain per [these instructions](https://www.namecheap.com/support/knowledgebase/article.aspx/9607/2210/how-to-set-up-dns-records-for-your-domain-in-a-cloudflare-account/), note that it may take up to 48 hours for this change to be applied.
+3. Log into the namecheap portal and add the CloudFlare name servers to the custom dns settings for your domain per [these instructions](https://www.namecheap.com/support/knowledgebase/article.aspx/9607/2210/how-to-set-up-dns-records-for-your-domain-in-a-cloudflare-account/), note that it may take up to 48 hours for this change to be applied.
 
 4. Clone this repo with git:
 ```
@@ -29,15 +29,15 @@ git clone https://github.com/ChrisAdkin8/cloudflare-demo.git
 domain = "<your domain name goes here>"
 ```
 
-6.  In the clouddlare portal obtain the zone id for your domain and add the following line to the terraform.tfvars file, replace the placeholder in angular brackets
+6.  In the CloudFlare portal obtain the zone id for your domain and add the following line to the terraform.tfvars file, replace the placeholder in angular brackets
     with your actual domain zone id:
 ```
 zone_id = "<your domain zone id goes here>"
 ```
 
-7. On the vertical menu bare on the left hand side of the screen (whilst still insiude the cloudflare portal), navigate to "Manage Account" -> "Account API Tokens" -> "Create Token" -> "Edit Zone DNS"
+7. On the vertical menu bare on the left hand side of the screen (whilst still insiude the CloudFlare portal), navigate to "Manage Account" -> "Account API Tokens" -> "Create Token" -> "Edit Zone DNS"
 
-8. On the screen for creating an "Edit Zone DNS" token, for "Zone resources", select the domain you registered with cloudflare when you signed up for a free account in step 2 as the specific domain to include.
+8. On the screen for creating an "Edit Zone DNS" token, for "Zone resources", select the domain you registered with CloudFlare when you signed up for a free account in step 2 as the specific domain to include.
 
 9. Click on "Continue to Summary" and then "Create Token", click on 'Copy' to copy the token string and then add the following line to the terraform.tfvars file,
    replace the placeholder in angular brackets with your actual api token:
@@ -112,7 +112,7 @@ EOT
     "SSL/TLS" on the left hand menu bar -> Configure -> "Custom SSL/TLS"
     -> hit the radio button for "Full (Strict)" and then hit Save.
 
-13. To create a customer certifcate for encryption signed by the CloudFlare CA, whilst still inside the CloudFlare
+13. To create a custom certifcate for encryption signed by the CloudFlare CA, whilst still inside the CloudFlare
     portal navigate through:
 
     "SSL/TLS" -> "Origin Server" -> "Create Certificate" -> (leave the defaults as they are) and hit 'Create'
@@ -130,11 +130,33 @@ EOT
 $ chmod +x httpd_bin.sh
 $ sudo ./httpd_bin.sh
 ```
+    what the shell script does is to recreate the httpbin container and allow is leverage httpd via the cloudflare CA signed
+    certifcate created earlier.
 
-18. 
+18. We will now create a zero trust tunnel on our origin server, to do this from within the cloudflare portal navigate to zero trust
+    on the vertical menu bar on the left hand side of the screen and login.
 
-    
+19. On the "Zero trust" screen add a domain (this can be changed later).
 
+20. Select and purchase the free zero trust plan.
+
+21. Navigate through:
+
+    Network -> Tunnels -> select Cloudflared -> give your tunnel a name -> hit save tunnel
+
+22. Because the ec2 instance uses Amazon Linux 2 which is based on CentOS, use the instuctions for deploying CloudFlared on Red Hat:
+```
+curl -L --output cloudflared.rpm https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-x86_64.rpm && 
+sudo yum localinstall -y cloudflared.rpm && 
+sudo cloudflared service install eyJhIjoiZmI0YTkxNDY4MjZjZGI5NmJlMGJjMGFmZjUwMzBjMzQiLCJ0IjoiOGJhZTlmMTItMjRiZS00OTQ2LWJkYmUtMTk5YjAwYzY4MGQyIiwicyI6Ik9HRTRaVE0yTURNdFpXSTRNQzAwTkRrd0xUbGtNemt0WTJNNU5URXdaVEl3WVRabSJ9 
+```
+    execute these commands within the bash shell of the ec2 instance.
+
+23. Within the CloudFlare portal on the screen which provides the server install instructions, hit 'Next'.
+
+24. On the tunnel configuration screen, select your domain from the drop down menu, select https as the type for the service and then localhost:443 for the URL.
+
+25. Click "Save Tunnel" and a screen should appear displaying that the status of your tunnel is healthy.    
     
     
  
