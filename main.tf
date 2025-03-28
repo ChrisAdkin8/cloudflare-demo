@@ -30,7 +30,7 @@ resource "aws_instance" "web" {
               yum install -y docker
               sudo systemctl enable docker
               sudo systemctl start docker
-              docker run -d -p 80:80 --name httpbin kennethreitz/httpbin
+              sudo docker run -d -p 80:80 --name httpbin kennethreitz/httpbin
               # Ensure directories necessary for the installation of
               # a cloudflare CA signed cert exists 
               mkdir -p /etc/ssl/certs
