@@ -67,41 +67,42 @@ export AWS_SESSION_EXPIRY=<your session expirey date time string goes here>
 Plan: 11 to add, 0 to change, 0 to destroy.
 
 Changes to Outputs:
-  + cert_pem_cp_command = (known after apply)
-  + key_pem_cp_command  = (known after apply)
+  + scp_to_ec2_commands = (known after apply)
 tls_private_key.ec2_key: Creating...
 aws_vpc.default: Creating...
-tls_private_key.ec2_key: Creation complete after 1s [id=19c3c39cb91be4bc98abc09d57646346d9996cd5]
+tls_private_key.ec2_key: Creation complete after 2s [id=a428e0ea937c01f2a623039bfab657bbb27a3f78]
 aws_key_pair.ec2_key_pair: Creating...
 local_file.private_key: Creating...
-local_file.private_key: Creation complete after 0s [id=b206a05924b033218b256031b8373d8953e7922e]
+local_file.private_key: Creation complete after 0s [id=a2e318eb6ac94482dc9447ec4d95f500d88d203e]
 aws_key_pair.ec2_key_pair: Provisioning with 'local-exec'...
 aws_key_pair.ec2_key_pair (local-exec): Executing: ["/bin/sh" "-c" "chmod 400 ec2-key.pem"]
 aws_key_pair.ec2_key_pair: Creation complete after 0s [id=ec2-key]
-aws_vpc.default: Creation complete after 2s [id=vpc-03722193fe99a47f0]
+aws_vpc.default: Creation complete after 2s [id=vpc-06f9eff95e3180479]
 aws_internet_gateway.main_igw: Creating...
 aws_subnet.default_subnet: Creating...
 aws_security_group.web_sg: Creating...
-aws_internet_gateway.main_igw: Creation complete after 1s [id=igw-0d8f68ee2b6f4c418]
+aws_internet_gateway.main_igw: Creation complete after 1s [id=igw-0c308a26061df57c3]
 aws_route_table.main_route_table: Creating...
-aws_route_table.main_route_table: Creation complete after 2s [id=rtb-071c3daab5e361647]
-aws_security_group.web_sg: Creation complete after 3s [id=sg-0f7198f659e5f21af]
+aws_route_table.main_route_table: Creation complete after 1s [id=rtb-051d06c255ea2f5cd]
+aws_security_group.web_sg: Creation complete after 2s [id=sg-02778028721598656]
 aws_subnet.default_subnet: Still creating... [10s elapsed]
-aws_subnet.default_subnet: Creation complete after 12s [id=subnet-0c89f81ed7e22c0f4]
+aws_subnet.default_subnet: Creation complete after 11s [id=subnet-068272ae599bd13bd]
 aws_route_table_association.main_assoc: Creating...
 aws_instance.web: Creating...
-aws_route_table_association.main_assoc: Creation complete after 0s [id=rtbassoc-0c2f5d37bf39b2527]
+aws_route_table_association.main_assoc: Creation complete after 1s [id=rtbassoc-060943681873065b0]
 aws_instance.web: Still creating... [10s elapsed]
-aws_instance.web: Creation complete after 13s [id=i-0e79b815d5197ac07]
+aws_instance.web: Creation complete after 14s [id=i-0391a455a99b3277a]
 cloudflare_dns_record.origin: Creating...
-cloudflare_dns_record.origin: Creation complete after 1s [id=68c2f2d4ac4e6404de2fab64f1f115b0]
+cloudflare_dns_record.origin: Creation complete after 1s [id=b0d684b48b5a8a520780650e0ddf6c6e]
 
 Apply complete! Resources: 11 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-cert_pem_cp_command = "scp -i ec2-key.pem cert.pem ec2-user@35.170.61.67:/etc/ssl/certs/"
-key_pem_cp_command = "scp -i ec2-key.pem key.pem ec2-user@35.170.61.67:/etc/ssl/key/"
+scp_to_ec2_commands = <<EOT
+scp -i ec2-key.pem cert.pem key.pem ec2-user@3.238.52.233:/etc/ssl/certs/
+scp -i ec2-key.pem httpd_bin.sh ec2-user@3.238.52.233:/home/ec2-user/
+EOT
 ```
 
 12. Next we are going to enforce strong encryption for traffic between your httpbin's visitors and Cloudflare,
@@ -121,6 +122,18 @@ key_pem_cp_command = "scp -i ec2-key.pem key.pem ec2-user@35.170.61.67:/etc/ssl/
 
 15. Issue ```terraform output``` to obtain the scp commands that need to be run in order to upload the key.pem
     and cert.pem files to your EC2 instance. Copy these commands and run them on your shell command line.
+
+16. Navigate to your EC2 instance from within the AWS portal, and lauch a bash shell session on the instance by connecting to it.
+
+17. Within the shell session, set the executable permission bit on the httpd_bin.sh shell script and execute the script:
+```
+$ chmod +x httpd_bin.sh
+$ sudo ./httpd_bin.sh
+```
+
+18. 
+
+    
 
     
     
